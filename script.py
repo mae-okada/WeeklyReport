@@ -1,10 +1,15 @@
 import pandas as pd
 import os
 import re
-from deep_translator import GoogleTranslator
 
-# === 0. Translator setup ===
-translator = GoogleTranslator(source='auto', target='ja')
+# === Optional translator (safe import) ===
+try:
+    from deep_translator import GoogleTranslator
+    translator = GoogleTranslator(source='auto', target='ja')
+    USE_TRANSLATOR = True
+except ImportError:
+    print("⚠️ deep-translator not installed, using original text")
+    USE_TRANSLATOR = False
 
 # === 1. Get Excel files ===
 folder = "data"
@@ -21,7 +26,6 @@ def extract_date(filename):
         return f"{y}{m}{d}"
     raise ValueError(f"Invalid filename format: {filename}")
 
-# Sort files
 files_sorted = sorted(files, key=extract_date)
 
 old_file = files_sorted[-2]
@@ -34,12 +38,15 @@ print(f"New file: {new_file}")
 df_old = pd.read_excel(os.path.join(folder, old_file), header=2)
 df_new = pd.read_excel(os.path.join(folder, new_file), header=2)
 
-# === 3.1 Clean columns ===
+# === 3.1 Clean columns (IMPORTANT) ===
 df_old.columns = df_old.columns.str.strip()
 df_new.columns = df_new.columns.str.strip()
 
 df_old = df_old.loc[:, ~df_old.columns.str.contains("^Unnamed")]
 df_new = df_new.loc[:, ~df_new.columns.str.contains("^Unnamed")]
+
+# Debug (optional)
+# print("Columns:", df_new.columns.tolist())
 
 # === 4. Merge ===
 merged = df_new.merge(
@@ -55,7 +62,6 @@ changed = merged[
     (~merged["Stage_old"].isna())
 ].copy()
 
-# Clean stage formatting (important!)
 changed["Stage"] = changed["Stage"].astype(str).str.strip()
 
 print(f"Changed rows: {len(changed)}")
@@ -70,11 +76,10 @@ stage_map = {
     "1-2. Potential (Renewal)": "■ 新規案件"
 }
 
-# === 7. Hybrid translation ===
+# === 7. Translation (HYBRID) ===
 def translate_project(text):
     text_lower = text.lower()
 
-    # 🔥 keyword overrides
     if "support" in text_lower:
         return "ITサポート"
     if "microsoft" in text_lower or "365" in text_lower:
@@ -82,11 +87,13 @@ def translate_project(text):
     if "esign" in text_lower or "sign" in text_lower:
         return "電子契約"
 
-    # 🌐 fallback
-    try:
-        return translator.translate(text)
-    except:
-        return text
+    if USE_TRANSLATOR:
+        try:
+            return translator.translate(text)
+        except:
+            return text
+
+    return text
 
 # === 8. Helpers ===
 def to_juta(value):
@@ -97,14 +104,17 @@ def to_juta(value):
 def format_row(row):
     company = row.get("Company", "-")
     size = to_juta(row.get("Size", 0))
-    product_raw = str(row.get("Products", "-")).strip()
+
+    # 🔥 NOW USING "Name" COLUMN
+    project_name = str(row.get("Name", "-")).strip()
+
     stage = str(row.get("Stage", ""))
 
-    product_jp = translate_project(product_raw)
+    project_jp = translate_project(project_name)
 
-    text = f"・{company} ： {size} / {product_jp}"
+    text = f"・{company} ： {size} / {project_jp}"
 
-    # Add suffix if NOT potential (1-x)
+    # Add suffix if NOT potential
     if not stage.startswith("1-"):
         text += " / <元野記入>"
 
