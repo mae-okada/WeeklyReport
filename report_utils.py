@@ -94,10 +94,11 @@ def format_row(row, translator):
     company_raw = row.get("Company", "-")
     company = clean_company_name(company_raw)
     size = to_juta(row.get("Size", 0))
-    project_name = str(row.get("Name", "-")).strip()
     stage = str(row.get("Stage", ""))
 
-    project_jp = translate_project(project_name, translator)
+    project_raw = str(row.get("Name", "-"))
+    project_clean = clean_project_name(project_raw)
+    project_jp = translate_project(project_clean, translator)
 
     text = f"・{company} ： {size} / {project_jp}"
 
@@ -157,3 +158,16 @@ def clean_company_name(name):
     
     # Trim whitespace
     return cleaned.strip()
+
+def clean_project_name(name):
+    if not isinstance(name, str):
+        return "-"
+    
+    # Split only at FIRST " - "
+    parts = name.split(" - ", 1)
+    
+    # If "-" exists → take the right side
+    if len(parts) > 1:
+        return parts[1].strip()
+    
+    return name.strip()
