@@ -67,12 +67,12 @@ def detect_stage_changes(df_old, df_new):
 def translate_project(text, translator):
     text_lower = text.lower()
 
-    if "support" in text_lower:
-        return "ITサポート"
-    if "microsoft" in text_lower or "365" in text_lower:
-        return "Microsoft 365導入"
-    if "esign" in text_lower or "sign" in text_lower:
-        return "電子契約"
+    # if "support" in text_lower:
+    #     return "ITサポート"
+    # if "microsoft" in text_lower or "365" in text_lower:
+    #     return "Microsoft 365導入"
+    # if "esign" in text_lower or "sign" in text_lower:
+    #     return "電子契約"
 
     if translator:
         try:
