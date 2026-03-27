@@ -91,7 +91,8 @@ def to_juta(value):
 
 
 def format_row(row, translator):
-    company = row.get("Company", "-")
+    company_raw = row.get("Company", "-")
+    company = clean_company_name(company_raw)
     size = to_juta(row.get("Size", 0))
     project_name = str(row.get("Name", "-")).strip()
     stage = str(row.get("Stage", ""))
@@ -117,10 +118,16 @@ def build_report(changed_df, translator):
         "1-2. Potential (Renewal)": "■ 新規案件"
     }
 
+    # 🔥 Group stages by JP title
+    grouped = {}
+    for stage, jp_title in stage_map.items():
+        grouped.setdefault(jp_title, []).append(stage)
+
     report_lines = []
 
-    for stage, jp_title in stage_map.items():
-        subset = changed_df[changed_df["Stage"] == stage]
+    # 🔥 Loop by JP title (NOT stage)
+    for jp_title, stages in grouped.items():
+        subset = changed_df[changed_df["Stage"].isin(stages)]
 
         if subset.empty:
             continue
@@ -134,10 +141,19 @@ def build_report(changed_df, translator):
 
     return report_lines
 
-
 # === Save ===
 def save_report(lines, filename="output.txt"):
     with open(filename, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
     print(f"✅ Report generated: {filename}")
+    
+def clean_company_name(name):
+    if not isinstance(name, str):
+        return "-"
+    
+    # Split at "-" and take first part
+    cleaned = name.split("-")[0]
+    
+    # Trim whitespace
+    return cleaned.strip()
