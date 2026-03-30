@@ -2,6 +2,8 @@ import pandas as pd
 import os
 import re
 
+from datetime import datetime
+
 # === Translator ===
 def setup_translator():
     try:
@@ -14,22 +16,30 @@ def setup_translator():
 
 # === File handling ===
 def get_excel_files(folder):
-    files = [f for f in os.listdir(folder) if f.endswith(".xlsx")]
-    if len(files) < 2:
-        raise ValueError("❌ Need at least 2 Excel files in /data folder")
-    return files
+    pattern = re.compile(r"deals_\d{4}_\d{2}_\d{2}\.xlsx$")
+    
+    files = [
+        f for f in os.listdir(folder)
+        if pattern.match(f)
+    ]
 
+    if len(files) < 2:
+        raise ValueError("❌ Need at least 2 valid deals_YYYY_MM_DD.xlsx files")
+
+    return files
 
 def extract_date(filename):
     match = re.search(r"deals_(\d{4})_(\d{2})_(\d{2})", filename)
     if match:
-        y, m, d = match.groups()
-        return f"{y}{m}{d}"
+        return datetime.strptime(match.group(0), "deals_%Y_%m_%d")
+    
     raise ValueError(f"Invalid filename format: {filename}")
 
 
 def get_latest_files(files):
     files_sorted = sorted(files, key=extract_date)
+    
+    # Take last 2 (latest)
     return files_sorted[-2], files_sorted[-1]
 
 
