@@ -35,7 +35,7 @@ def main():
 
     if not changed.empty:
         report_lines = build_report(changed, translator)
-        save_report(report_lines, "report_of_changes.txt")
+        save_report(report_lines, "プロジェクト_ステージ変更リスト.txt")
     else:
         print("⚠️ No changes detected")
 
@@ -48,7 +48,7 @@ def main():
 
     if not mgt_df.empty:
         mgt_report = build_report(mgt_df, translator)
-        save_report(mgt_report, "MGTI_all_deals.txt")
+        save_report(mgt_report, "プロジェクト_営業部管轄リスト.txt")
     else:
         print("⚠️ No MGTI deals found")
 
