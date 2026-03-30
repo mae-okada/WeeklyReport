@@ -4,6 +4,15 @@ import re
 
 from datetime import datetime
 
+stage_map = {
+        "5.  Sales (Invoice)": "注文書受領",
+        "4. S/O": "注文書受領",
+        "3. Quotation": "見積り提出",
+        "2. Proposal": "提案",
+        "1-1. Potential (New Opportunity)": "新規案件",
+        "1-2. Potential (Renewal)": "新規案件"
+    }
+
 # === Translator ===
 def setup_translator():
     try:
@@ -53,7 +62,6 @@ def load_excel(folder, filename):
     return df
 
 
-# === Detect changes ===
 def detect_stage_changes(df_old, df_new):
     merged = df_new.merge(
         df_old[["ID", "Stage"]],
@@ -62,16 +70,25 @@ def detect_stage_changes(df_old, df_new):
         suffixes=("", "_old")
     )
 
-    changed = merged[
+    # A. Stage changed
+    changed_stage = merged[
         (merged["Stage"] != merged["Stage_old"]) &
         (~merged["Stage_old"].isna())
-    ].copy()
+    ]
 
-    changed["Stage"] = changed["Stage"].astype(str).str.strip()
+    # B. New deals (ID not found in old file)
+    new_deals = merged[merged["Stage_old"].isna()]
 
-    print(f"Changed rows: {len(changed)}")
-    return changed
+    # 🔥 Combine both
+    result = pd.concat([changed_stage, new_deals]).copy()
 
+    result["Stage"] = result["Stage"].astype(str).str.strip()
+
+    print(f"Changed stage rows: {len(changed_stage)}")
+    print(f"New deals: {len(new_deals)}")
+    print(f"Total included: {len(result)}")
+
+    return result
 
 # === Translation ===
 def translate_project(text, translator):
@@ -105,6 +122,7 @@ def format_row(row, translator):
     company = clean_company_name(company_raw)
     size = to_juta(row.get("Size", 0))
     stage = str(row.get("Stage", ""))
+    deal_id = str(row.get("ID", ""))
 
     project_raw = str(row.get("Name", "-"))
     project_clean = clean_project_name(project_raw)
@@ -114,21 +132,25 @@ def format_row(row, translator):
 
     if not stage.startswith("1-"):
         text += " / <元野記入>"
+        
+    text += f" / {deal_id}"
+    
+    # 🔥 Add ID before "New"
+    is_new = pd.isna(row.get("Stage_old"))
+    if is_new:
+        deal_id = row.get("ID", "-")
+        text += " / 【新規】"
+    else:
+        # mapping based on "stage map"
+        old_stage = str(row.get("Stage_old", "")).strip()
+        jp_stage = stage_map.get(old_stage, old_stage)  # fallback if not found
+        text += f" / 【{jp_stage}】"
 
     return text
 
 
 # === Report builder ===
 def build_report(changed_df, translator):
-    stage_map = {
-        "5.  Sales (Invoice)": "■ 注文書受領",
-        "4. S/O": "■ 注文書受領",
-        "3. Quotation": "■ 見積り提出",
-        "2. Proposal": "■ 提案",
-        "1-1. Potential (New Opportunity)": "■ 新規案件",
-        "1-2. Potential (Renewal)": "■ 新規案件"
-    }
-
     # 🔥 Group stages by JP title
     grouped = {}
     for stage, jp_title in stage_map.items():
@@ -143,7 +165,7 @@ def build_report(changed_df, translator):
         if subset.empty:
             continue
 
-        report_lines.append(jp_title)
+        report_lines.append(f"■ {jp_title}")
 
         for _, row in subset.iterrows():
             report_lines.append(format_row(row, translator))

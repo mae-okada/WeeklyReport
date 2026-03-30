@@ -1,13 +1,19 @@
 ■ 注文書受領
-・Aeon Fantasy Indonesia ： 10 Juta / 新規店舗オープン時の IT サポート 1 回 (1W) / <元野記入>
-・YKK AP Indonesia ： 40 Juta / UIPathトレーニング - 作業料金 / <元野記入>
-・YKK AP Indonesia ： 108 Juta / UIPath トレーニング - ライセンス / <元野記入>
-・YKK AP Indonesia ： 45 Juta / UIPath トレーニング - 開発 / <元野記入>
+・Aeon Fantasy Indonesia ： 10 Juta / 新規店舗オープン時の IT サポート 1 回 (1W) / <元野記入> / 991UTCHROP / 【注文書受領】
+・YKK AP Indonesia ： 40 Juta / UIPathトレーニング - 作業料金 / <元野記入> / 505XCHEEIK / 【見積り提出】
+・YKK AP Indonesia ： 108 Juta / UIPath トレーニング - ライセンス / <元野記入> / 717TANIALL / 【見積り提出】
+・YKK AP Indonesia ： 45 Juta / UIPath トレーニング - 開発 / <元野記入> / 591INEEPHY / 【見積り提出】
 
 ■ 見積り提出
-・Avesta Continental Pack ： 78 Juta / ソフトウェア - Microsoft - 365 Business Basic / <元野記入>
-・Indogravure ： 61 Juta / ソフトウェア - Microsoft - 365 Business Basic / <元野記入>
-・Indogravure ： 50 Juta / MS365実装/メール移行 / <元野記入>
+・Avesta Continental Pack ： 78 Juta / ソフトウェア - Microsoft - 365 Business Basic / <元野記入> / 325ERANTBE / 【提案】
+・Indogravure ： 61 Juta / ソフトウェア - Microsoft - 365 Business Basic / <元野記入> / 346SMELETI / 【提案】
+・Indogravure ： 50 Juta / MS365実装/メール移行 / <元野記入> / 200MATERVE / 【提案】
+・Marimo Global Technology Japan ： 130 Juta / YMIN MSダイマニクスの実装 / <元野記入> / 804MPARBOA / 【新規】
+・Marimo Global Technology Japan ： 100 Juta / MAM IT調査をサポート / <元野記入> / 395TAECTRO / 【新規】
+・Avesta Continental Pack ： 50 Juta / MS365実装/メール移行 / <元野記入> / 408ARBOENZ / 【新規】
+・Indogravure ： 12 Juta / メンテナンスとサポート / <元野記入> / 237ENSISMI / 【新規】
+・YKK AP Indonesia ： 50 Juta / AR エージング ワークフロー - Intramart 開発 / <元野記入> / 712CRANKER / 【新規】
 
 ■ 提案
-・NTT DATA Indonesia ： 477 Juta / NDID - Intramart 開発サポート / <元野記入>
+・NTT DATA Indonesia ： 477 Juta / Intramart 開発サポート / <元野記入> / 192ILLEITC / 【新規案件】
+・Mitsubishi Motor Krama Yudha Indonesia (MMKI) ： 170 Juta / コネクテッドカーの強化 - Intramart Dev. / <元野記入> / 219CAROGER / 【新規】
