@@ -135,15 +135,20 @@ def format_row(row, translator):
         
     text += f" / {deal_id}"
     
-    # 🔥 Add ID before "New"
-    is_new = pd.isna(row.get("Stage_old"))
-    if is_new:
-        deal_id = row.get("ID", "-")
-        text += " / 【新規】"
+    stage_old = row.get("Stage_old", None)
+
+    if stage_old is None:
+        # 👉 Full dataset (MGTI report)
+        pass
+
+    elif pd.isna(stage_old):
+        # 👉 New deal
+        text += " / 【初】"
+
     else:
-        # mapping based on "stage map"
-        old_stage = str(row.get("Stage_old", "")).strip()
-        jp_stage = stage_map.get(old_stage, old_stage)  # fallback if not found
+        # 👉 Stage changed
+        old_stage = str(stage_old).strip()
+        jp_stage = stage_map.get(old_stage, old_stage)
         text += f" / 【{jp_stage}】"
 
     return text
@@ -203,3 +208,9 @@ def clean_project_name(name):
         return parts[1].strip()
     
     return name.strip()
+
+def filter_by_owner(df, keyword="MGTI"):
+    col = "Owner Fullname"
+    return df[
+        df[col].astype(str).str.contains(keyword, case=False, na=False)
+    ].copy()
