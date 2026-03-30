@@ -138,8 +138,17 @@ def format_row(row, translator):
     stage_old = row.get("Stage_old", None)
 
     if stage_old is None:
-        # 👉 Full dataset (MGTI report)
-        pass
+        owner_raw = str(row.get("Owner Fullname", "-")).strip()
+
+        parts = owner_raw.split()
+
+        # Remove "MGTI" if present
+        parts = [p for p in parts if p.upper() != "MGTI"]
+
+        # Take first remaining as person name
+        owner = parts[0] if parts else "-"
+
+        text += f" / {owner}"
 
     elif pd.isna(stage_old):
         # 👉 New deal
