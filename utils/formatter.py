@@ -15,9 +15,14 @@ def format_row(row, translator):
 
     text = f"・{company} ： {size} / {project_jp}"
 
-    if not stage.startswith("1-"):
-        text += " / <元野記入>"
-
+    # if not stage.startswith("1-"):
+    #     text += " / <元野記入>"
+        
+    if stage.startswith("3"):
+        text += " / 注文書待ち"
+    elif stage.startswith("4") or stage == "5.  Sales (Invoice)":
+        text += " / 請求書発行"
+    
     text += f" / {deal_id}"
 
     stage_old = row.get("Stage_old")
@@ -30,7 +35,8 @@ def format_row(row, translator):
         text += " / 【初】"
 
     else:
-        jp_stage = stage_map.get(str(stage_old).strip(), stage_old)
-        text += f" / 【{jp_stage}】"
+        jp_old_stage = stage_map.get(str(stage_old).strip(), stage_old)
+        jp_new_stage = stage_map.get(str(stage).strip(), stage)
+        text += f" / 【{jp_old_stage} → {jp_new_stage}】"
 
     return text

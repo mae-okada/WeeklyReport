@@ -11,17 +11,21 @@ def build_report(df, translator):
     for jp_title, stages in grouped.items():
         subset = df[df["Stage"].isin(stages)]
 
+        lines.append(f"■ {jp_title}")
+        
         if subset.empty:
+            lines.append("<なし>")
+            lines.append("")
             continue
 
-        lines.append(f"■ {jp_title}")
 
         for _, row in subset.iterrows():
             lines.append(format_row(row, translator))
 
         lines.append("")
-
+        
     return lines
+        
 
 
 def save_report(lines, path):
