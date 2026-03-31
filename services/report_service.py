@@ -18,7 +18,6 @@ def build_report(df, translator):
             lines.append("")
             continue
 
-
         for _, row in subset.iterrows():
             lines.append(format_row(row, translator))
 

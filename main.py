@@ -1,7 +1,7 @@
 import os
 
 from services.file_service import get_excel_files, get_latest_files
-from services.excel_service import load_excel, detect_stage_changes
+from services.excel_service import load_excel, detect_stage_changes, detect_owned_by_sales
 from services.report_service import build_report, save_report
 from services.translator import setup_translator
 
@@ -21,13 +21,13 @@ def main():
 
     # Change report
     changed = detect_stage_changes(df_old, df_new)
-    if not changed.empty:
-        report = build_report(changed, translator)
-        save_report(report, f"{output_folder}/プロジェクト_ステージ変更リスト.txt")
+    report = build_report(changed, translator)
+    save_report(report, f"{output_folder}/プロジェクト_ステージ変更リスト.txt")
 
-    # Full report
-    report_all = build_report(df_new, translator)
-    save_report(report_all, f"{output_folder}/プロジェクト_営業部管轄リスト.tx")
+    # Owned by Sales report
+    owned_by_sales = detect_owned_by_sales(df_new)
+    sales_report = build_report(owned_by_sales, translator)
+    save_report(sales_report, f"{output_folder}/プロジェクト_営業部管轄リスト.txt")
 
     print("✅ Done")
 

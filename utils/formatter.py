@@ -28,7 +28,7 @@ def format_row(row, translator):
     stage_old = row.get("Stage_old")
 
     if stage_old is None:
-        owner = row.get("Owner Fullname", "").split()[-2]
+        owner = row.get("Owner Fullname", "")
         text += f" / {owner}"
 
     elif pd.isna(stage_old):
