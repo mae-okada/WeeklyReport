@@ -1,7 +1,7 @@
 from config.stage_map import stage_map
 from utils.formatter import format_row
 
-def build_report(df, translator):
+def build_report(df, translator, use_name=False):
     grouped = {}
     for stage, jp in stage_map.items():
         grouped.setdefault(jp, []).append(stage)
@@ -19,7 +19,7 @@ def build_report(df, translator):
             continue
 
         for _, row in subset.iterrows():
-            lines.append(format_row(row, translator))
+            lines.append(format_row(row, translator, use_name))
 
         lines.append("")
         

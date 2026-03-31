@@ -4,7 +4,7 @@ from config.stage_map import stage_map
 from services.translator import translate_project
 import pandas as pd
 
-def format_row(row, translator):
+def format_row(row, translator, use_name=False):
     company = clean_company_name(row.get("Company", "-"))
     size = to_juta(row.get("Size", 0))
     stage = str(row.get("Stage", ""))
@@ -20,14 +20,16 @@ def format_row(row, translator):
         
     if stage.startswith("3"):
         text += " / 注文書待ち"
-    elif stage.startswith("4") or stage == "5.  Sales (Invoice)":
+    elif stage.startswith("4"):
         text += " / 請求書発行"
+    elif stage == "5.  Sales (Invoice)":
+        text += " / 請求書送付済み"
     
     text += f" / {deal_id}"
 
     stage_old = row.get("Stage_old")
 
-    if stage_old is None:
+    if use_name:
         owner = row.get("Owner Fullname", "")
         text += f" / {owner}"
 
