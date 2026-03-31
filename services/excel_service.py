@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+from datetime import datetime
+
 
 def load_excel(folder, filename):
     df = pd.read_excel(os.path.join(folder, filename), header=2)
@@ -9,8 +11,26 @@ def load_excel(folder, filename):
 
     return df
 
-import pandas as pd
-from datetime import datetime
+
+def filter_by_days_in_stage(df, stage_name="4. S/O"):
+    # 1. Replace the column value with the value before the first space
+    stage_name = f"Days on stage {stage_name}"
+    
+    df = df.copy()  # avoid modifying original DataFrame
+    df[stage_name] = (
+        df[stage_name]
+        .astype(str)
+        .str.split(" ", n=1)
+        .str[0]
+        .astype("Int64")  # nullable integer
+    )
+
+    # 2. Filter rows where the value is <= 7
+    filter = df[df[stage_name] <= 7]
+
+    # 3. Return filtered DataFrame
+    return filter
+
 
 def filter_renewal_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *"):
     
@@ -84,12 +104,25 @@ def detect_owned_by_sales(df_new):
 
     # 2. Identify next-month renewals (Stage = "1-2" AND effective date next month)
     df_sales_renewal = filter_renewal_next_month(df_sales)
+    df_sales_so = filter_by_days_in_stage(df_sales)
+    df_sales_inv = filter_by_days_in_stage(df_sales, "5.  Sales (Invoice)")
 
     # 3. Remove renewals from df_sales
-    df_sales_exclude_renewal = df_sales[
+    df_sales_clean = df_sales[
         ~df_sales["Stage"].astype(str).str.startswith("1-2")
+    ].copy()
+    df_sales_clean = df_sales_clean[
+        ~df_sales_clean["Stage"].astype(str).str.startswith("4.")
+    ].copy()
+    df_sales_clean = df_sales_clean[
+        ~df_sales_clean["Stage"].astype(str).str.startswith("5.")
     ].copy()
 
     # 4. Return remaining sales records
-    result = pd.concat([df_sales_exclude_renewal, df_sales_renewal]).copy()
+    result = pd.concat([
+        df_sales_clean, 
+        df_sales_renewal, 
+        df_sales_so,
+        df_sales_inv
+        ]).copy()
     return result.copy()
