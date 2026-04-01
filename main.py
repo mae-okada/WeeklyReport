@@ -23,6 +23,7 @@ def main():
     print("<<Start>> Update list")
     changed = detect_stage_changes(df_old, df_new)
     report = build_report(changed, translator)
+    print("<<Saving>> Update list")
     save_report(report, f"{output_folder}/プロジェクト_ステージ変更リスト.txt")
     print("<<End>> Update list")
 
@@ -30,6 +31,7 @@ def main():
     print("<<Start>> Sales list")
     owned_by_sales = detect_owned_by_sales(df_new)
     sales_report = build_report(owned_by_sales, translator, True)
+    print("<<Saving>> Sales list")
     save_report(sales_report, f"{output_folder}/プロジェクト_営業部管轄リスト.txt")
     print("<<End>> Sales list")
 
