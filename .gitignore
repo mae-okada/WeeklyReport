@@ -2,10 +2,3 @@ output/*
 __pycache__/
 *.log
 *.txt
-
-log.txt
-config/__pycache__/stage_map.cpython-314.pyc
-output/プロジェクト_ステージ変更リスト.txt
-output/プロジェクト_営業部管轄リスト.txt
-services/__pycache__/excel_service.cpython-314.pyc
-utils/__pycache__/formatter.cpython-314.pyc

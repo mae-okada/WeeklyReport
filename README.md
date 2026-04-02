@@ -1,3 +1,25 @@
-Purpose: Reformat report from excel-base to text-base, with mentioning only
-- new projects
-- projects that has change in stage
+【週刊レポート生成スクリプト】
+
+～使い方～
+レポート生成には【generate_report.bat】ファイルをクリックしてください。
+【output】フォルダ内に最新のレポートが格納されます。
+
+～各レポートの定義～
+1．【プロジェクト_ステージ変更リスト.txt】
+    - 【data】フォルダ内に格納されているエクセルファイルの内、ファイル名が一番大きいファイル2つを比較。
+    - ２つのファイルの内、【Stage】の値に変動がみられる行のみをリポート化
+
+2．【プロジェクト_営業部管轄リスト.txt】
+    - 【data】フォルダ内に格納されているエクセルファイルの内、ファイル名が一番大きいファイル1つをレポート化。
+    - レポート化対象のデータは【Owner Fullname】が営業部員の行のみである。
+
+～各ステージの条件～
+    1-1. Potential (New Opportunity): 新規案件
+    1-2. Potential (Renewal): 更新案件
+        【プロジェクト_営業部管轄リスト.txt】内対象 → 来月更新のプロジェクトのみ
+    2. Proposal: 提案
+    3. Quotation: 見積り提出
+    4. S/O: 注文書受領
+        【プロジェクト_営業部管轄リスト.txt】内対象 → 過去7日以内に上がってきたプロジェクトのみ
+    5. Sales (Invoice): 請求書送付済
+        【プロジェクト_営業部管轄リスト.txt】内対象 → 過去7日以内に上がってきたプロジェクトのみ
