@@ -35,7 +35,7 @@ def filter_by_days_in_stage(df, stage_name):
     return df[cond_stage & cond_days].copy()
 
 
-def filter_renewal_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *"): 
+def filter_renewal_this_and_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *"): 
     today = datetime.today()
 
     # Convert date column to datetime
@@ -45,22 +45,24 @@ def filter_renewal_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *")
         errors="coerce"
     )
 
-    # Calculate next month start
+    # Calculate next month start & end
+    start_this_month = datetime(today.year, today.month, 1)
+    
     if today.month == 12:
-        start_next_month = datetime(today.year + 1, 1, 1)
+        end_next_month = datetime(today.year + 1, 2, 1)
+    elif today.month == 11:
+        end_next_month = datetime(today.year + 1, 1, 1)
     else:
-        start_next_month = datetime(today.year, today.month + 1, 1)
-
-    # Calculate end of next month
-    end_next_month = datetime(start_next_month.year, start_next_month.month + 1, 1)
+        end_next_month = datetime(today.year, today.month + 2, 1)
+    # end_next_month = datetime(start_next_month.year, start_next_month.month + 1, 1)
 
     # Condition 1: Stage starts with "1-2"
     cond_stage_renewal = df["Stage"].astype(str).str.startswith("1-2")
 
     # Condition 2: Date is within next month
-    print(f"Filtering for renewals with effective date between {start_next_month.date()} and {end_next_month.date()}")
+    print(f"Filtering for renewals with effective date between {start_this_month.date()} and {end_next_month.date()}")
     cond_next_month = (
-        (df[date_col] >= start_next_month) &
+        (df[date_col] >= start_this_month) &
         (df[date_col] < end_next_month)
     )
 
@@ -91,10 +93,16 @@ def detect_stage_changes(df_old, df_new):
 
     result = pd.concat([changed, new]).copy()
     
-    renewal = filter_renewal_next_month(df_new)
+    renewal = filter_renewal_this_and_next_month(df_new)
     result = pd.concat([result, renewal]).copy()
     
     return result
+
+def extract_one_stage(df, stage_prefix="4. S/O"):
+    return df[df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
+
+def drop_one_stage(df, stage_prefix="4. S/O"):
+    return df[~df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
 
 def detect_owned_by_sales(df_new):
     # 1. Filter owned by Sales
@@ -108,21 +116,21 @@ def detect_owned_by_sales(df_new):
         ]
 
     # 2. Identify next-month renewals (Stage = "1-2" AND effective date next month)
-    df_sales_renewal = filter_renewal_next_month(df_sales)
-    df_sales_so = filter_by_days_in_stage(df_sales, "4. S/O")
-    df_sales_inv = filter_by_days_in_stage(df_sales, "5. Sales (Invoice)")
+    df_sales_renewal = filter_renewal_this_and_next_month(df_sales)
+    # df_sales_so = filter_by_days_in_stage(df_sales, "4. S/O")
+    # df_sales_inv = filter_by_days_in_stage(df_sales, "5. Sales (Invoice)")
 
     # 3. Remove renewals from df_sales
     df_sales_clean = df_sales[
-        ~df_sales["Stage"].astype(str).str.startswith(("1-2", "4.", "5."))
+        ~df_sales["Stage"].astype(str).str.startswith(("1-2"))
     ].copy()
 
     # 4. Return remaining sales records
     result = pd.concat([
         df_sales_clean, 
         df_sales_renewal, 
-        df_sales_so,
-        df_sales_inv
+        # df_sales_so,
+        # df_sales_inv
         ]).copy()
     
     result = result.drop_duplicates(subset=["ID"])

@@ -4,7 +4,7 @@ from config.stage_map import stage_map
 from services.translator import translate_project
 import pandas as pd
 
-def format_row(row, translator, use_name=False):
+def format_row(row, translator, use_name=False, use_stage=True):
     company = clean_company_name(row.get("Company", "-"))
     size = to_juta(row.get("Size", 0))
     stage = str(row.get("Stage", ""))
@@ -30,18 +30,21 @@ def format_row(row, translator, use_name=False):
     
     text += f" / {deal_id}"
 
-    stage_old = row.get("Stage_old")
-
     if use_name:
         owner = row.get("Owner Fullname", "")
         text += f" / {owner}"
 
-    elif pd.isna(stage_old):
-        text += " / 【初】"
-
-    else:
-        jp_old_stage = stage_map.get(str(stage_old).strip(), stage_old)
-        jp_new_stage = stage_map.get(str(stage).strip(), stage)
-        text += f" / 【{jp_old_stage} → {jp_new_stage}】"
+    if use_stage:
+        stage_old = row.get("Stage_old")
+        if pd.isna(stage_old):
+            if project.lower().__contains__("renewal"):    
+                jp_new_stage = stage_map.get(str(stage).strip(), stage)            
+                text += f" / 【新規案件 → {jp_new_stage}】"
+            else:
+                text += " / 【初】"
+        else:
+            jp_old_stage = stage_map.get(str(stage_old).strip(), stage_old)
+            jp_new_stage = stage_map.get(str(stage).strip(), stage)
+            text += f" / 【{jp_old_stage} → {jp_new_stage}】"
 
     return text

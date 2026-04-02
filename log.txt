@@ -1,9 +1,0 @@
-<<Start>> Update list
-Filtering for renewals with effective date between 2026-05-01 and 2026-06-01
-<<Saving>> Update list
-<<End>> Update list
-<<Start>> Sales list
-Filtering for renewals with effective date between 2026-05-01 and 2026-06-01
-<<Saving>> Sales list
-<<End>> Sales list
-Done!
