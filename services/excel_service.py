@@ -80,9 +80,11 @@ def detect_stage_changes(df_old, df_new):
         suffixes=("", "_old")
     )
 
+    # ❗ Exclude rows where previous stage is 5 (Invoice)
     changed = merged[
         (merged["Stage"] != merged["Stage_old"]) &
-        (~merged["Stage_old"].isna())
+        (~merged["Stage_old"].isna()) &
+        (~merged["Stage_old"].astype(str).str.startswith("5"))
     ]
 
     new = merged[merged["Stage_old"].isna()]

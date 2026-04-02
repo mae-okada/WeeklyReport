@@ -1,5 +1,5 @@
 stage_map = {
-    "5. Sales (Invoice)": "請求書送付済",
+    "5. Sales (Invoice)": "注文書受領",
     "4. S/O": "注文書受領",
     "3. Quotation": "見積り提出",
     "2. Proposal": "提案",
