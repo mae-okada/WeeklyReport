@@ -13,23 +13,23 @@ def load_excel(folder, filename):
 
 
 def filter_by_days_in_stage(df, stage_name="4. S/O"):
-    # 1. Replace the column value with the value before the first space
-    stage_name = f"Days on stage {stage_name}"
-    
-    df = df.copy()  # avoid modifying original DataFrame
-    df[stage_name] = (
-        df[stage_name]
+    col = f"Days on stage {stage_name}"
+
+    # ✅ Handle missing column safely
+    if col not in df.columns:
+        return pd.DataFrame(columns=df.columns)  # return empty df
+
+    df = df.copy()
+
+    df[col] = (
+        df[col]
         .astype(str)
         .str.split(" ", n=1)
         .str[0]
-        .astype("Int64")  # nullable integer
+        .astype("Int64")
     )
 
-    # 2. Filter rows where the value is >= 7
-    filter = df[df[stage_name] >= 7]
-
-    # 3. Return filtered DataFrame
-    return filter
+    return df[df[col].notnull() & (df[col] <= 7)].copy()
 
 
 def filter_renewal_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *"):
@@ -56,6 +56,7 @@ def filter_renewal_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *")
     cond_stage_renewal = df["Stage"].astype(str).str.startswith("1-2")
 
     # Condition 2: Date is within next month
+    print(f"Filtering for renewals with effective date between {start_next_month.date()} and {end_next_month.date()}")
     cond_next_month = (
         (df[date_col] >= start_next_month) &
         (df[date_col] < end_next_month)
@@ -105,7 +106,7 @@ def detect_owned_by_sales(df_new):
     # 2. Identify next-month renewals (Stage = "1-2" AND effective date next month)
     df_sales_renewal = filter_renewal_next_month(df_sales)
     df_sales_so = filter_by_days_in_stage(df_sales)
-    df_sales_inv = filter_by_days_in_stage(df_sales, "5.  Sales (Invoice)")
+    df_sales_inv = filter_by_days_in_stage(df_sales, "5. Sales (Invoice)")
 
     # 3. Remove renewals from df_sales
     df_sales_clean = df_sales[
