@@ -12,7 +12,7 @@ def load_excel(folder, filename):
     return df
 
 
-def filter_by_days_in_stage(df, stage_name="4. S/O"):
+def filter_by_days_in_stage(df, stage_name):
     col = f"Days on stage {stage_name}"
 
     # ✅ Handle missing column safely
@@ -29,11 +29,13 @@ def filter_by_days_in_stage(df, stage_name="4. S/O"):
         .astype("Int64")
     )
 
-    return df[df[col].notnull() & (df[col] <= 7)].copy()
+    cond_stage = df["Stage"].astype(str).str.startswith(stage_name.split(".")[0])
+    cond_days = df[col].notnull() & (df[col] <= 7)
+
+    return df[cond_stage & cond_days].copy()
 
 
-def filter_renewal_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *"):
-    
+def filter_renewal_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *"): 
     today = datetime.today()
 
     # Convert date column to datetime
@@ -105,7 +107,7 @@ def detect_owned_by_sales(df_new):
 
     # 2. Identify next-month renewals (Stage = "1-2" AND effective date next month)
     df_sales_renewal = filter_renewal_next_month(df_sales)
-    df_sales_so = filter_by_days_in_stage(df_sales)
+    df_sales_so = filter_by_days_in_stage(df_sales, "4. S/O")
     df_sales_inv = filter_by_days_in_stage(df_sales, "5. Sales (Invoice)")
 
     # 3. Remove renewals from df_sales

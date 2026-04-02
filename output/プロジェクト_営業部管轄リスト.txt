@@ -1,0 +1,28 @@
+■ 請求書送付済
+<なし>
+
+■ 注文書受領
+<なし>
+
+■ 見積り提出
+・Mitsubishi Motors Krama Yudha Indonesia ： 237 Juta / Intra mart 本番サーバ(リニューアル) / 注文書待ち / 335ECHEARR / MGTI okada
+・Mitsubishi Motors Krama Yudha Indonesia ： 133 Juta / サポートおよびメンテナンス サービス - IT サポート / 注文書待ち / 848WORWORG / MGTI okada
+・Berlian Amal Perkasa ： 66 Juta / コンサルティング サービス - 追加サポート / 注文書待ち / 335LLAYMET / MGTI okada
+・Berlian Amal Perkasa ： 66 Juta / サポートおよびメンテナンス サービス - IT サポート / 注文書待ち / 803NECURAT / MGTI okada
+・Aeon Fantasy Indonesia ： 112 Juta / セキュリティ対策商品（更新） / 注文書待ち / 587NNISHMA / MGTI Luky
+・Toyo Business Engineering Indonesia ： 76 Juta / イントラマート / 注文書待ち / 420RALTANE / MGTI Barri
+
+■ 提案
+・SCSK Global Indonesia ： 2916 Juta / システム開発サービス - イントラマート / 810UDONTRI / MGTI okada
+・Indogravure ： 53 Juta / サポートおよびメンテナンス サービス - メンテナンス / 721LIPERWI / MGTI Luky
+
+■ 新規案件
+・SUMIDEN SERASI WIRE PRODUCTS ： 30 Juta / ITサポート / 038AGSTFUL / MGTI okada
+・MC Technos Indonesia ： 6 Juta / 電子署名ソフト / 179ERACTAT / MGTI Barri
+・Parker Metal Treatment Indonesia ： 30 Juta / IT評価 / 721RAELEMP / MGTI Barri
+・Reksa Finance ： 100 Juta / 会社買収後のシステム統合 / 316INAUCCU / MGTI Barri
+・HAZAMA ANDO MURINDA ： 132 Juta / ITサポート（ソフトバンクからの乗り換え） / 070WEARIAN / Katsuhiro Motono
+・SUMIDEN SERASI WIRE PRODUCTS ： 40 Juta / DXアセスメント（DXサーベイ） / 151SMARDYL / MGTI okada
+
+■ 更新案件
+・Nittoc Construction Indonesia ： 79 Juta / セキュリティ対策商品（更新） / 更新日： 2026-05-20 / 808INASTOC / MGTI Barri

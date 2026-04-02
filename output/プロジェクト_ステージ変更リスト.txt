@@ -1,0 +1,27 @@
+■ 請求書送付済
+<なし>
+
+■ 注文書受領
+・YKK AP Indonesia ： 40 Juta / UIPathトレーニング - 作業料金 / 請求書発行 / 505XCHEEIK / 【見積り提出 → 注文書受領】
+・YKK AP Indonesia ： 108 Juta / UIPath トレーニング - ライセンス / 請求書発行 / 717TANIALL / 【見積り提出 → 注文書受領】
+・YKK AP Indonesia ： 45 Juta / UIPath トレーニング - 開発 / 請求書発行 / 591INEEPHY / 【見積り提出 → 注文書受領】
+
+■ 見積り提出
+・Avesta Continental Pack ： 78 Juta / ソフトウェア - Microsoft - 365 Business Basic / 注文書待ち / 325ERANTBE / 【提案 → 見積り提出】
+・Indogravure ： 61 Juta / ソフトウェア - Microsoft - 365 Business Basic / 注文書待ち / 346SMELETI / 【提案 → 見積り提出】
+・Indogravure ： 50 Juta / MS365実装/メール移行 / 注文書待ち / 200MATERVE / 【提案 → 見積り提出】
+・Marimo Global Technology Japan ： 130 Juta / YMIN MSダイマニクスの実装 / 注文書待ち / 804MPARBOA / 【初】
+・Marimo Global Technology Japan ： 100 Juta / MAM IT調査をサポート / 注文書待ち / 395TAECTRO / 【初】
+・Avesta Continental Pack ： 50 Juta / MS365実装/メール移行 / 注文書待ち / 408ARBOENZ / 【初】
+・Indogravure ： 12 Juta / メンテナンスとサポート / 注文書待ち / 237ENSISMI / 【初】
+・YKK AP Indonesia ： 50 Juta / AR エージング ワークフロー - Intramart 開発 / 注文書待ち / 712CRANKER / 【初】
+
+■ 提案
+・NTT DATA Indonesia ： 477 Juta / NDID - Intramart 開発サポート / 192ILLEITC / 【新規案件 → 提案】
+・Mitsubishi Motor Krama Yudha Indonesia (MMKI) ： 170 Juta / コネクテッドカーの強化 - Intramart Dev. / 219CAROGER / 【初】
+
+■ 新規案件
+<なし>
+
+■ 更新案件
+・Nittoc Construction Indonesia ： 79 Juta / セキュリティ対策商品（更新） / 更新日： 2026-05-20 / 808INASTOC / 【初】

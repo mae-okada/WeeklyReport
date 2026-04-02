@@ -22,6 +22,9 @@ def format_row(row, translator, use_name=False):
         text += " / 注文書待ち"
     elif stage.startswith("4"):
         text += " / 請求書発行"
+    elif stage == "1-2. Potential (Renewal)":
+        effective_date = row.get("1-2. Effective Date (if 1-1 YES) *", "")
+        text += f" / 更新日： {effective_date.date()}"
     elif stage == "5.  Sales (Invoice)":
         text += " / 請求書送付済み"
     

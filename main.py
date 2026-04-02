@@ -35,7 +35,7 @@ def main():
     save_report(sales_report, f"{output_folder}/プロジェクト_営業部管轄リスト.txt")
     print("<<End>> Sales list")
 
-    print("✅ Done")
+    print("Done!")
 
 
 if __name__ == "__main__":
