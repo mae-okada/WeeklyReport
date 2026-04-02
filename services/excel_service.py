@@ -25,8 +25,8 @@ def filter_by_days_in_stage(df, stage_name="4. S/O"):
         .astype("Int64")  # nullable integer
     )
 
-    # 2. Filter rows where the value is <= 7
-    filter = df[df[stage_name] <= 7]
+    # 2. Filter rows where the value is >= 7
+    filter = df[df[stage_name] >= 7]
 
     # 3. Return filtered DataFrame
     return filter
@@ -109,13 +109,7 @@ def detect_owned_by_sales(df_new):
 
     # 3. Remove renewals from df_sales
     df_sales_clean = df_sales[
-        ~df_sales["Stage"].astype(str).str.startswith("1-2")
-    ].copy()
-    df_sales_clean = df_sales_clean[
-        ~df_sales_clean["Stage"].astype(str).str.startswith("4.")
-    ].copy()
-    df_sales_clean = df_sales_clean[
-        ~df_sales_clean["Stage"].astype(str).str.startswith("5.")
+        ~df_sales["Stage"].astype(str).str.startswith(("1-2", "4.", "5."))
     ].copy()
 
     # 4. Return remaining sales records
@@ -125,4 +119,6 @@ def detect_owned_by_sales(df_new):
         df_sales_so,
         df_sales_inv
         ]).copy()
+    
+    result = result.drop_duplicates(subset=["ID"])
     return result.copy()
