@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+from datetime import datetime
+
 from services.file_service import get_excel_files, get_latest_files
 from services.excel_service import extract_one_stage, load_excel, detect_stage_changes, detect_owned_by_sales, drop_one_stage
 from services.report_service import build_report, save_report
@@ -38,18 +40,26 @@ def main():
     
     # Final - Owned by Sales Weekly report
     print("<<Start>> Weekly list")
+    
+    # Get data in stage "4. S/O" that is new (not included in the previous report)
     changed = detect_stage_changes(df_old, df_new)
     changed_so_stage = extract_one_stage(changed, "4. S/O")
+    
+    #remove stage "4. S/O" from the new data frame to avoid duplication
     dropped_so_stage = drop_one_stage(df_new, "4. S/O")
+    
+    # concat the changed stage "4. S/O" and the rest of the new data frame, then filter for owned by sales
     final_report = pd.concat([changed_so_stage, dropped_so_stage]).drop_duplicates().copy()
     owned_by_sales = detect_owned_by_sales(final_report)
+    
+    # Build report for projects owned by sales
     sales_report = build_report(owned_by_sales, translator, False, True)
+    
+    #save the report with today's date
     print("<<Saving>> Weekly list")
-    save_report(sales_report, f"{output_folder}/週刊レポート.txt")
+    today_str = datetime.today().strftime("%Y%m%d")
+    save_report(sales_report, f"{output_folder}/週刊レポート_{today_str}.txt")
     print("<<End>> Weekly list")
-
-    print("Done!")
-
 
 if __name__ == "__main__":
     main()
