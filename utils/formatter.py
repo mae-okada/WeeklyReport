@@ -19,7 +19,9 @@ def format_row(row, translator, use_name=False, use_stage=True):
     #     text += " / <元野記入>"
         
     if stage.startswith("3"):
-        text += " / 注文書待ち"
+        goal_grade = row.get("3-3. Goal Grade to S/O（〃）*", "")
+        goal_grade = str(goal_grade).split(" ")[0] if pd.notna(goal_grade) else ""    
+        text += f" / 注文書待ち/ ランク{goal_grade}"
     elif stage.startswith("4"):
         text += " / 請求書発行"
     elif stage == "1-2. Potential (Renewal)":
