@@ -65,11 +65,15 @@ def filter_renewal_this_and_next_month(df, date_col="1-2. Effective Date (if 1-1
         (df[date_col] >= start_this_month) &
         (df[date_col] < end_next_month)
     )
+    
+    print(f"Total records: {len(df)}, Stage 1-2: {cond_stage_renewal.sum()}, Next month: {cond_next_month.sum()}")
 
     # Apply BOTH conditions
     filtered = df[
         cond_stage_renewal & cond_next_month
     ]
+    
+    print(f"Filtered renewals this/next month: {len(filtered)}")
 
     return filtered
 
@@ -135,3 +139,26 @@ def detect_owned_by_sales(df_new):
     
     result = result.drop_duplicates(subset=["ID"])
     return result.copy()
+
+def detect_change_in_size(df_old, df_new, size_col="Size"):
+    # Merge old + new on ID
+    merged = df_new.merge(
+        df_old[["ID", size_col]],
+        on="ID",
+        how="left",
+        suffixes=("", "_old")
+    )
+
+    # Detect size changes (exclude null old values)
+    changed = merged[
+        (merged[size_col] != merged[f"{size_col}_old"]) &
+        (~merged[f"{size_col}_old"].isna())
+    ]
+
+    # Detect new records (no previous size)
+    new = merged[merged[f"{size_col}_old"].isna()]
+
+    # Combine results
+    result = pd.concat([changed, new]).copy()
+
+    return result

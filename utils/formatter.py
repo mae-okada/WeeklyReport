@@ -6,14 +6,36 @@ import pandas as pd
 
 def format_row(row, translator, use_name=False, use_stage=True):
     company = clean_company_name(row.get("Company", "-"))
-    size = to_juta(row.get("Size", 0))
+    
+    size_val = row.get("Size", 0)
+    size_old_val = row.get("Size_old")
+    
+    size = to_juta(size_val)
+    
+    if pd.notna(size_old_val):
+        try:
+            diff = size_val - size_old_val
+            if diff != 0:
+                diff_text = to_juta(abs(diff))
+                sign = "+" if diff > 0 else "-"
+                size = f"{size} ({sign}{diff_text})"
+        except:
+            pass 
+    
     stage = str(row.get("Stage", ""))
     deal_id = str(row.get("ID", ""))
 
     project = clean_project_name(row.get("Name", "-"))
     project_jp = translate_project(project, translator)
 
-    text = f"・{company} ： {size} / {project_jp}"
+    text = f"・{company} ： {size}"
+
+    if stage.startswith("3"):
+        goal_grade = row.get("3-3. Goal Grade to S/O（〃）*", "")
+        goal_grade = str(goal_grade).split(" ")[0] if pd.notna(goal_grade) else ""    
+        text += f" / ランク{goal_grade}"
+        
+    text += f" / {project_jp}"
 
     # if not stage.startswith("1-"):
     #     text += " / <元野記入>"
@@ -21,12 +43,19 @@ def format_row(row, translator, use_name=False, use_stage=True):
     if stage.startswith("3"):
         goal_grade = row.get("3-3. Goal Grade to S/O（〃）*", "")
         goal_grade = str(goal_grade).split(" ")[0] if pd.notna(goal_grade) else ""    
-        text += f" / 注文書待ち/ ランク{goal_grade}"
+        text += f" / 注文書待ち"
     elif stage.startswith("4"):
         text += " / 請求書発行"
     elif stage == "1-2. Potential (Renewal)":
         effective_date = row.get("1-2. Effective Date (if 1-1 YES) *", "")
-        text += f" / 更新日： {effective_date.date()}"
+        if pd.notna(effective_date):
+            effective_date = pd.to_datetime(
+                    effective_date,
+                    format="%d/%m/%Y",
+                    errors="coerce"
+                )
+            if pd.notna(effective_date):
+                text += f" / 更新日： {effective_date.date()}"
     elif stage == "5.  Sales (Invoice)":
         text += " / 請求書送付済み"
     
