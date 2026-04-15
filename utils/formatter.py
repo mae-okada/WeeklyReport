@@ -58,7 +58,7 @@ def format_row(row, translator, use_name=False, use_stage=True):
     elif stage == "5.  Sales (Invoice)":
         text += " / 請求書送付済み"
     
-    text += f" / {deal_id}"
+    # text += f" / {deal_id}"
 
     if use_name:
         owner = row.get("Owner Fullname", "")
