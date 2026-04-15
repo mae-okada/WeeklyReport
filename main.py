@@ -45,6 +45,7 @@ class WeeklyReportApp:
         )
 
         changed = pd.concat([changed_stage, changed_size_full]).drop_duplicates(subset=["ID"])
+        changed = self.excel_service.sort_by_size(changed, ascending=False)
 
         lines = self.report_service.build_report(changed, use_name=True, use_stage=True)
         self.report_service.save_report(lines, f"{self.output_folder}/{self.today_str}_ステージ変更リスト.txt")
@@ -59,6 +60,7 @@ class WeeklyReportApp:
 
         final_report = pd.concat([changed_so_stage, dropped_so_stage]).drop_duplicates().copy()
         owned_by_sales = self.excel_service.detect_owned_by_sales(final_report)
+        owned_by_sales = self.excel_service.sort_by_size(owned_by_sales, ascending=False)
 
         lines = self.report_service.build_report(owned_by_sales, use_name=False, use_stage=True)
         self.report_service.save_report(lines, f"{self.output_folder}/{self.today_str}_週刊レポート.txt")

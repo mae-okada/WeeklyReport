@@ -57,6 +57,10 @@ The project now uses a class-based design with clear responsibilities:
       - filters sales-owned rows and renewal projects
     - `detect_change_in_size(self, df_old, df_new, size_col="Size")`
       - detects rows with changed deal size values
+    - `sort_by_size(self, df, ascending=False, size_col="Size")`
+      - sorts dataframe by deal size
+      - `ascending=False` (default): largest deals first
+      - `ascending=True`: smallest deals first
 
 - `services/report_service.py`
   - `ReportService`

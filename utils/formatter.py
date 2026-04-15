@@ -33,7 +33,7 @@ def format_row(row, translator, use_name=False, use_stage=True):
         goal_grade = row.get("3-3. Goal Grade to S/O（〃）*", "")
         goal_grade = str(goal_grade).split(" ")[0] if pd.notna(goal_grade) else ""    
         text += f" / ランク{goal_grade}"
-        
+                                         
     text += f" / {project_jp}"
 
     # if not stage.startswith("1-"):

@@ -126,3 +126,19 @@ class ExcelService:
 
         new = merged[merged[f"{size_col}_old"].isna()]
         return pd.concat([changed, new]).copy()
+
+    def sort_by_size(self, df, ascending=False, size_col="Size"):
+        """
+        Sort dataframe by deal size.
+        
+        Args:
+            df: DataFrame to sort
+            ascending: If False (default), largest sizes first; if True, smallest first
+            size_col: Column name containing the size values
+        
+        Returns:
+            Sorted DataFrame
+        """
+        df = df.copy()
+        df[size_col] = pd.to_numeric(df[size_col], errors="coerce")
+        return df.sort_values(by=size_col, ascending=ascending, na_position="last").copy()
