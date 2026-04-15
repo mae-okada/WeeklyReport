@@ -54,7 +54,8 @@ The project now uses a class-based design with clear responsibilities:
     - `drop_one_stage(self, df, stage_prefix)`
       - removes rows matching a stage prefix
     - `detect_owned_by_sales(self, df_new)`
-      - filters sales-owned rows and renewal projects
+      - includes all `4. S/O` stage rows regardless of owner
+      - filters owned-by-sales rows and renewal projects for other stages
     - `detect_change_in_size(self, df_old, df_new, size_col="Size")`
       - detects rows with changed deal size values
     - `sort_by_size(self, df, ascending=False, size_col="Size")`

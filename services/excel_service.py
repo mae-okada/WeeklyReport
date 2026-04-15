@@ -95,6 +95,8 @@ class ExcelService:
         return df[~df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
 
     def detect_owned_by_sales(self, df_new):
+        df_so_stage = df_new[df_new["Stage"].astype(str).str.startswith("4. S/O")].copy()
+
         df_sales = df_new[df_new["Owner Fullname"].isin([
             "MGTI okada",
             "MGTI Barri",
@@ -108,7 +110,7 @@ class ExcelService:
             ~df_sales["Stage"].astype(str).str.startswith(("1-2"))
         ].copy()
 
-        result = pd.concat([df_sales_clean, df_sales_renewal]).copy()
+        result = pd.concat([df_so_stage, df_sales_clean, df_sales_renewal]).copy()
         return result.drop_duplicates(subset=["ID"]).copy()
 
     def detect_change_in_size(self, df_old, df_new, size_col="Size"):
