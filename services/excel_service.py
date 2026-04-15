@@ -3,13 +3,21 @@ from datetime import datetime
 
 
 class ExcelService:
+    """Service methods for loading Excel data and deriving report-related datasets."""
+
     def load_excel(self, folder, filename):
+        """Load an Excel file, clean header columns, and return a DataFrame."""
         df = pd.read_excel(f"{folder}/{filename}", header=2)
         df.columns = df.columns.str.strip()
         df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
         return df
 
     def filter_by_days_in_stage(self, df, stage_name):
+        """Return rows for a stage with recent days-on-stage values.
+
+        It extracts the numeric days value, then returns rows where the
+        stage starts with the given prefix and the day count is 7 or less.
+        """
         col = f"Days on stage {stage_name}"
 
         if col not in df.columns:
@@ -30,6 +38,7 @@ class ExcelService:
         return df[cond_stage & cond_days].copy()
 
     def filter_renewal_this_and_next_month(self, df, date_col="1-2. Effective Date (if 1-1 YES) *"):
+        """Return renewal rows with effective dates this or next month."""
         df = df.copy()
         today = datetime.today()
 
@@ -69,6 +78,7 @@ class ExcelService:
         return filtered
 
     def detect_stage_changes(self, df_old, df_new):
+        """Return rows with changed stages or new records since the old dataset."""
         merged = df_new.merge(
             df_old[["ID", "Stage"]],
             on="ID",
@@ -89,12 +99,15 @@ class ExcelService:
         return pd.concat([result, renewal]).copy()
 
     def extract_one_stage(self, df, stage_prefix="4. S/O"):
+        """Select and return rows where Stage starts with the provided prefix."""
         return df[df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
 
     def drop_one_stage(self, df, stage_prefix="4. S/O"):
+        """Remove rows where Stage starts with the provided prefix."""
         return df[~df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
 
     def detect_owned_by_sales(self, df_new):
+        """Return sales-owned rows plus all S/O stage rows regardless of owner."""
         df_so_stage = df_new[df_new["Stage"].astype(str).str.startswith("4. S/O")].copy()
 
         df_sales = df_new[df_new["Owner Fullname"].isin([
@@ -114,6 +127,7 @@ class ExcelService:
         return result.drop_duplicates(subset=["ID"]).copy()
 
     def detect_change_in_size(self, df_old, df_new, size_col="Size"):
+        """Return rows whose size field has changed or are newly added."""
         merged = df_new.merge(
             df_old[["ID", size_col]],
             on="ID",
@@ -130,17 +144,7 @@ class ExcelService:
         return pd.concat([changed, new]).copy()
 
     def sort_by_size(self, df, ascending=False, size_col="Size"):
-        """
-        Sort dataframe by deal size.
-        
-        Args:
-            df: DataFrame to sort
-            ascending: If False (default), largest sizes first; if True, smallest first
-            size_col: Column name containing the size values
-        
-        Returns:
-            Sorted DataFrame
-        """
+        """Sort a DataFrame by the size column, with largest values first by default."""
         df = df.copy()
         df[size_col] = pd.to_numeric(df[size_col], errors="coerce")
         return df.sort_values(by=size_col, ascending=ascending, na_position="last").copy()

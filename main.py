@@ -10,7 +10,14 @@ from services.translator import TranslatorService
 
 
 class WeeklyReportApp:
+    """Main application class for generating weekly reports."""
+
     def __init__(self, data_folder="data", output_folder="output"):
+        """Initialize the WeeklyReportApp with data and output paths.
+
+        The constructor creates service objects used to locate files,
+        read Excel data, translate project names, and build reports.
+        """
         self.data_folder = data_folder
         self.output_folder = output_folder
         self.file_locator = ExcelFileLocator(data_folder)
@@ -20,12 +27,19 @@ class WeeklyReportApp:
 
     @property
     def today_str(self):
+        """Return today's date string in YYYYMMDD format for output filenames."""
         return datetime.today().strftime("%Y%m%d")
 
     def create_output_folder(self):
+        """Ensure the output directory exists before report generation."""
         os.makedirs(self.output_folder, exist_ok=True)
 
     def load_latest_data(self):
+        """Load the two newest deal files and return old/new DataFrames.
+
+        This method locates files matching the expected naming convention,
+        selects the latest two, and loads each as a pandas DataFrame.
+        """
         files = self.file_locator.get_excel_files()
         old_file, new_file = self.file_locator.get_latest_files(files)
 
@@ -34,6 +48,11 @@ class WeeklyReportApp:
         return df_old, df_new
 
     def generate_change_report(self, df_old, df_new):
+        """Build and save the stage-change report sorted by deal size.
+
+        The method detects stage updates and size changes, merges them,
+        sorts the combined dataset by size in descending order, and saves it.
+        """
         print("<<Start>> Update list")
         changed_stage = self.excel_service.detect_stage_changes(df_old, df_new)
         changed_size = self.excel_service.detect_change_in_size(df_old, df_new)
@@ -52,6 +71,11 @@ class WeeklyReportApp:
         print("<<End>> Update list")
 
     def generate_weekly_report(self, df_old, df_new):
+        """Build and save the sales weekly report sorted by deal size.
+
+        This method combines S/O stage records with other sales-owned data,
+        then sorts the result by deal size before writing the file.
+        """
         print("<<Start>> Weekly list")
 
         changed = self.excel_service.detect_stage_changes(df_old, df_new)
@@ -67,6 +91,7 @@ class WeeklyReportApp:
         print("<<End>> Weekly list")
 
     def run(self):
+        """Execute the full weekly report generation workflow."""
         self.create_output_folder()
         df_old, df_new = self.load_latest_data()
         self.generate_change_report(df_old, df_new)

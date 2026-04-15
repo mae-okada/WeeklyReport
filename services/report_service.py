@@ -3,10 +3,14 @@ from utils.formatter import format_row
 
 
 class ReportService:
+    """Service for building and saving text report output."""
+
     def __init__(self, translator=None):
+        """Initialize the report service with an optional translator."""
         self.translator = translator
 
     def build_report(self, df, use_name=False, use_stage=False):
+        """Build a list of report lines grouped by Japanese stage labels."""
         grouped = {}
         for stage, jp in stage_map.items():
             grouped.setdefault(jp, []).append(stage)
@@ -29,5 +33,6 @@ class ReportService:
         return lines
 
     def save_report(self, lines, path):
+        """Write the prepared report lines to a UTF-8 text file."""
         with open(path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))

@@ -1,8 +1,12 @@
 class TranslatorService:
+    """Service to translate project names using heuristics or an optional backend."""
+
     def __init__(self):
+        """Initialize translation service and configure the backend translator."""
         self.translator = self._setup_translator()
 
     def _setup_translator(self):
+        """Attempt to configure GoogleTranslator from deep_translator."""
         try:
             from deep_translator import GoogleTranslator
             return GoogleTranslator(source='auto', target='ja')
@@ -10,6 +14,7 @@ class TranslatorService:
             return None
 
     def translate_project(self, text):
+        """Translate a project name using keyword rules and fallback logic."""
         text_lower = text.lower()
 
         if "forti" in text_lower:

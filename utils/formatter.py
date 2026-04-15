@@ -4,6 +4,7 @@ from config.stage_map import stage_map
 import pandas as pd
 
 def format_row(row, translator, use_name=False, use_stage=True):
+    """Format a single deal row into the report output text."""
     company = clean_company_name(row.get("Company", "-"))
     
     size_val = row.get("Size", 0)
