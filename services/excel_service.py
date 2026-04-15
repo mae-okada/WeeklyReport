@@ -1,164 +1,128 @@
 import pandas as pd
-import os
 from datetime import datetime
 
 
-def load_excel(folder, filename):
-    df = pd.read_excel(os.path.join(folder, filename), header=2)
+class ExcelService:
+    def load_excel(self, folder, filename):
+        df = pd.read_excel(f"{folder}/{filename}", header=2)
+        df.columns = df.columns.str.strip()
+        df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
+        return df
 
-    df.columns = df.columns.str.strip()
-    df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
+    def filter_by_days_in_stage(self, df, stage_name):
+        col = f"Days on stage {stage_name}"
 
-    return df
+        if col not in df.columns:
+            return pd.DataFrame(columns=df.columns)
 
+        df = df.copy()
+        df[col] = (
+            df[col]
+            .astype(str)
+            .str.split(" ", n=1)
+            .str[0]
+            .astype("Int64")
+        )
 
-def filter_by_days_in_stage(df, stage_name):
-    col = f"Days on stage {stage_name}"
+        cond_stage = df["Stage"].astype(str).str.startswith(stage_name.split(".")[0])
+        cond_days = df[col].notnull() & (df[col] <= 7)
 
-    # ✅ Handle missing column safely
-    if col not in df.columns:
-        return pd.DataFrame(columns=df.columns)  # return empty df
+        return df[cond_stage & cond_days].copy()
 
-    df = df.copy()
+    def filter_renewal_this_and_next_month(self, df, date_col="1-2. Effective Date (if 1-1 YES) *"):
+        df = df.copy()
+        today = datetime.today()
 
-    df[col] = (
-        df[col]
-        .astype(str)
-        .str.split(" ", n=1)
-        .str[0]
-        .astype("Int64")
-    )
+        df[date_col] = pd.to_datetime(
+            df[date_col],
+            format="%d/%m/%Y",
+            errors="coerce"
+        )
 
-    cond_stage = df["Stage"].astype(str).str.startswith(stage_name.split(".")[0])
-    cond_days = df[col].notnull() & (df[col] <= 7)
+        start_this_month = datetime(today.year, today.month, 1)
+        if today.month == 12:
+            end_next_month = datetime(today.year + 1, 2, 1)
+        elif today.month == 11:
+            end_next_month = datetime(today.year + 1, 1, 1)
+        else:
+            end_next_month = datetime(today.year, today.month + 2, 1)
 
-    return df[cond_stage & cond_days].copy()
+        cond_stage_renewal = df["Stage"].astype(str).str.startswith("1-2")
 
+        print(
+            f"Filtering for renewals with effective date between "
+            f"{start_this_month.date()} and {end_next_month.date()}"
+        )
+        cond_next_month = (
+            (df[date_col] >= start_this_month) &
+            (df[date_col] < end_next_month)
+        )
 
-def filter_renewal_this_and_next_month(df, date_col="1-2. Effective Date (if 1-1 YES) *"): 
-    today = datetime.today()
+        print(
+            f"Total records: {len(df)}, Stage 1-2: {cond_stage_renewal.sum()}, "
+            f"Next month: {cond_next_month.sum()}"
+        )
 
-    # Convert date column to datetime
-    df[date_col] = pd.to_datetime(
-        df[date_col],
-        format="%d/%m/%Y",
-        errors="coerce"
-    )
+        filtered = df[cond_stage_renewal & cond_next_month]
+        print(f"Filtered renewals this/next month: {len(filtered)}")
 
-    # Calculate next month start & end
-    start_this_month = datetime(today.year, today.month, 1)
-    
-    if today.month == 12:
-        end_next_month = datetime(today.year + 1, 2, 1)
-    elif today.month == 11:
-        end_next_month = datetime(today.year + 1, 1, 1)
-    else:
-        end_next_month = datetime(today.year, today.month + 2, 1)
-    # end_next_month = datetime(start_next_month.year, start_next_month.month + 1, 1)
+        return filtered
 
-    # Condition 1: Stage starts with "1-2"
-    cond_stage_renewal = df["Stage"].astype(str).str.startswith("1-2")
+    def detect_stage_changes(self, df_old, df_new):
+        merged = df_new.merge(
+            df_old[["ID", "Stage"]],
+            on="ID",
+            how="left",
+            suffixes=("", "_old")
+        )
 
-    # Condition 2: Date is within next month
-    print(f"Filtering for renewals with effective date between {start_this_month.date()} and {end_next_month.date()}")
-    cond_next_month = (
-        (df[date_col] >= start_this_month) &
-        (df[date_col] < end_next_month)
-    )
-    
-    print(f"Total records: {len(df)}, Stage 1-2: {cond_stage_renewal.sum()}, Next month: {cond_next_month.sum()}")
-
-    # Apply BOTH conditions
-    filtered = df[
-        cond_stage_renewal & cond_next_month
-    ]
-    
-    print(f"Filtered renewals this/next month: {len(filtered)}")
-
-    return filtered
-
-
-def detect_stage_changes(df_old, df_new):
-    merged = df_new.merge(
-        df_old[["ID", "Stage"]],
-        on="ID",
-        how="left",
-        suffixes=("", "_old")
-    )
-
-    # ❗ Exclude rows where previous stage is 5 (Invoice)
-    changed = merged[
-        (merged["Stage"] != merged["Stage_old"]) &
-        (~merged["Stage_old"].isna()) &
-        (~merged["Stage_old"].astype(str).str.startswith("5"))
-    ]
-
-    new = merged[merged["Stage_old"].isna()]
-
-    result = pd.concat([changed, new]).copy()
-    
-    renewal = filter_renewal_this_and_next_month(df_new)
-    result = pd.concat([result, renewal]).copy()
-    
-    return result
-
-def extract_one_stage(df, stage_prefix="4. S/O"):
-    return df[df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
-
-def drop_one_stage(df, stage_prefix="4. S/O"):
-    return df[~df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
-
-def detect_owned_by_sales(df_new):
-    # 1. Filter owned by Sales
-    df_sales = df_new[
-        df_new["Owner Fullname"].isin([
-            "MGTI okada", 
-            "MGTI Barri", 
-            "MGTI Luky",
-            "Katsuhiro Motono"
-            ])
+        changed = merged[
+            (merged["Stage"] != merged["Stage_old"]) &
+            (~merged["Stage_old"].isna()) &
+            (~merged["Stage_old"].astype(str).str.startswith("5"))
         ]
 
-    # 2. Identify next-month renewals (Stage = "1-2" AND effective date next month)
-    df_sales_renewal = filter_renewal_this_and_next_month(df_sales)
-    # df_sales_so = filter_by_days_in_stage(df_sales, "4. S/O")
-    # df_sales_inv = filter_by_days_in_stage(df_sales, "5. Sales (Invoice)")
+        new = merged[merged["Stage_old"].isna()]
+        result = pd.concat([changed, new]).copy()
 
-    # 3. Remove renewals from df_sales
-    df_sales_clean = df_sales[
-        ~df_sales["Stage"].astype(str).str.startswith(("1-2"))
-    ].copy()
+        renewal = self.filter_renewal_this_and_next_month(df_new)
+        return pd.concat([result, renewal]).copy()
 
-    # 4. Return remaining sales records
-    result = pd.concat([
-        df_sales_clean, 
-        df_sales_renewal, 
-        # df_sales_so,
-        # df_sales_inv
-        ]).copy()
-    
-    result = result.drop_duplicates(subset=["ID"])
-    return result.copy()
+    def extract_one_stage(self, df, stage_prefix="4. S/O"):
+        return df[df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
 
-def detect_change_in_size(df_old, df_new, size_col="Size"):
-    # Merge old + new on ID
-    merged = df_new.merge(
-        df_old[["ID", size_col]],
-        on="ID",
-        how="left",
-        suffixes=("", "_old")
-    )
+    def drop_one_stage(self, df, stage_prefix="4. S/O"):
+        return df[~df["Stage"].astype(str).str.startswith(stage_prefix)].copy()
 
-    # Detect size changes (exclude null old values)
-    changed = merged[
-        (merged[size_col] != merged[f"{size_col}_old"]) &
-        (~merged[f"{size_col}_old"].isna())
-    ]
+    def detect_owned_by_sales(self, df_new):
+        df_sales = df_new[df_new["Owner Fullname"].isin([
+            "MGTI okada",
+            "MGTI Barri",
+            "MGTI Luky",
+            "Katsuhiro Motono"
+        ])]
 
-    # Detect new records (no previous size)
-    new = merged[merged[f"{size_col}_old"].isna()]
+        df_sales_renewal = self.filter_renewal_this_and_next_month(df_sales)
 
-    # Combine results
-    result = pd.concat([changed, new]).copy()
+        df_sales_clean = df_sales[
+            ~df_sales["Stage"].astype(str).str.startswith(("1-2"))
+        ].copy()
 
-    return result
+        result = pd.concat([df_sales_clean, df_sales_renewal]).copy()
+        return result.drop_duplicates(subset=["ID"]).copy()
+
+    def detect_change_in_size(self, df_old, df_new, size_col="Size"):
+        merged = df_new.merge(
+            df_old[["ID", size_col]],
+            on="ID",
+            how="left",
+            suffixes=("", "_old")
+        )
+
+        changed = merged[
+            (merged[size_col] != merged[f"{size_col}_old"]) &
+            (~merged[f"{size_col}_old"].isna())
+        ]
+
+        new = merged[merged[f"{size_col}_old"].isna()]
+        return pd.concat([changed, new]).copy()

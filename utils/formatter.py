@@ -1,7 +1,6 @@
 from utils.cleaner import clean_company_name, clean_project_name
 from utils.helpers import to_juta
 from config.stage_map import stage_map
-from services.translator import translate_project
 import pandas as pd
 
 def format_row(row, translator, use_name=False, use_stage=True):
@@ -26,7 +25,7 @@ def format_row(row, translator, use_name=False, use_stage=True):
     deal_id = str(row.get("ID", ""))
 
     project = clean_project_name(row.get("Name", "-"))
-    project_jp = translate_project(project, translator)
+    project_jp = translator.translate_project(project) if translator else project
 
     text = f"・{company} ： {size}"
 
