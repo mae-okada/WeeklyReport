@@ -46,16 +46,16 @@ def format_row(row, translator, use_name=False, use_stage=True):
         text += f" / 注文書待ち"
     elif stage.startswith("4"):
         text += " / 請求書発行"
-    elif stage == "1-2. Potential (Renewal)":
-        effective_date = row.get("1-2. Effective Date (if 1-1 YES) *", "")
-        if pd.notna(effective_date):
-            effective_date = pd.to_datetime(
-                    effective_date,
-                    format="%d/%m/%Y",
-                    errors="coerce"
-                )
-            if pd.notna(effective_date):
-                text += f" / 更新日： {effective_date.date()}"
+    # elif stage == "1-2. Potential (Renewal)":
+    #     effective_date = row.get("1-2. Effective Date (if 1-1 YES) *", "")
+    #     if pd.notna(effective_date):
+    #         effective_date = pd.to_datetime(
+    #                 effective_date,
+    #                 format="%d/%m/%Y",
+    #                 errors="coerce"
+    #             )
+    #         if pd.notna(effective_date):
+    #             text += f" / 更新日： {effective_date.date()}"
     elif stage == "5.  Sales (Invoice)":
         text += " / 請求書送付済み"
     
