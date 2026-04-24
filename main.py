@@ -73,16 +73,24 @@ class WeeklyReportApp:
     def generate_weekly_report(self, df_old, df_new):
         """Build and save the sales weekly report sorted by deal size.
 
-        This method combines S/O stage records with other sales-owned data,
-        then sorts the result by deal size before writing the file.
+        This method preserves old-stage values for every row when available,
+        keeps unchanged S/O records, and then filters the result by sales
+        ownership before writing the file.
         """
         print("<<Start>> Weekly list")
 
+        merged_all = df_new.merge(
+            df_old[["ID", "Stage"]],
+            on="ID",
+            how="left",
+            suffixes=("", "_old")
+        )
         changed = self.excel_service.detect_stage_changes(df_old, df_new)
-        changed_so_stage = self.excel_service.extract_one_stage(changed, "4. S/O")
-        dropped_so_stage = self.excel_service.drop_one_stage(df_new, "4. S/O")
 
-        final_report = pd.concat([changed_so_stage, dropped_so_stage]).drop_duplicates().copy()
+        so_stage_rows = self.excel_service.extract_one_stage(changed, "4. S/O")
+        non_so_rows = self.excel_service.drop_one_stage(merged_all, "4. S/O")
+
+        final_report = pd.concat([so_stage_rows, non_so_rows]).drop_duplicates(subset=["ID"]).copy()
         owned_by_sales = self.excel_service.detect_owned_by_sales(final_report)
         owned_by_sales = self.excel_service.sort_by_size(owned_by_sales, ascending=False)
 
