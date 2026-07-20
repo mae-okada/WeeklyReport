@@ -94,7 +94,7 @@ class WeeklyReportApp:
         owned_by_sales = self.excel_service.detect_owned_by_sales(final_report)
         owned_by_sales = self.excel_service.sort_by_size(owned_by_sales, ascending=False)
 
-        lines = self.report_service.build_report(owned_by_sales, use_name=False, use_stage=True)
+        lines = self.report_service.build_report(owned_by_sales, use_name=False, use_stage=False)
         self.report_service.save_report(lines, f"{self.output_folder}/{self.today_str}_週刊レポート.txt")
         print("<<End>> Weekly list")
 
@@ -102,7 +102,7 @@ class WeeklyReportApp:
         """Execute the full weekly report generation workflow."""
         self.create_output_folder()
         df_old, df_new = self.load_latest_data()
-        self.generate_change_report(df_old, df_new)
+        # self.generate_change_report(df_old, df_new)
         self.generate_weekly_report(df_old, df_new)
 
 
