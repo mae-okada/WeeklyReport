@@ -1,3 +1,6 @@
+import re
+
+
 class TranslatorService:
     """Service to translate project names using heuristics or an optional backend."""
 
@@ -16,18 +19,22 @@ class TranslatorService:
     def translate_project(self, text):
         """Translate a project name using keyword rules and fallback logic."""
         text_lower = text.lower()
+        has_renewal = "renewal" in text_lower
 
         if "forti" in text_lower:
-            return "セキュリティ対策商品（更新）" if "renewal" in text_lower else "セキュリティ対策商品"
+            return "セキュリティ対策商品" + (" 更新" if has_renewal else "")
 
         if "acronis" in text_lower:
-            return "アンチウイルスソフト（更新）" if "renewal" in text_lower else "アンチウイルスソフト"
+            return "アンチウイルスソフト" + (" 更新" if has_renewal else "")
 
         if "esign" in text_lower:
             return "電子署名ソフト"
 
         if text.lower().startswith("ndid - "):
             text = text[7:].strip()
+
+        if has_renewal:
+            text = re.sub(r"\brenewal\b", "更新", text, flags=re.IGNORECASE)
 
         if self.translator:
             try:

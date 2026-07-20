@@ -18,6 +18,14 @@ class ReportService:
         lines = []
         for jp_title, stages in grouped.items():
             subset = df[df["Stage"].isin(stages)]
+            # Remove renewal projects from stages 1-1 and 1-2 entirely from the report
+            try:
+                mask_stage_1 = subset["Stage"].astype(str).str.startswith("1-2")
+                mask_renewal = subset["Name"].astype(str).str.lower().str.contains("renewal")
+                subset = subset[~(mask_stage_1 & mask_renewal)]
+            except Exception:
+                # If any unexpected issues occur (missing columns/types), skip filtering
+                pass
             lines.append(f"■ {jp_title}")
 
             if subset.empty:
