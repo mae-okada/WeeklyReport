@@ -2,12 +2,6 @@
 
 cd /d "%~dp0"
 
-if not exist requirements.txt (
-    echo requirements.txt not found.
-    pause
-    exit /b 1
-)
-
 where py >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
     echo Python was not found on PATH. Install Python first.
@@ -15,7 +9,9 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-py -m pip install -r requirements.txt
+echo Running weekly report generator...
 py main.py 2> log.txt
 
+echo.
+echo Report generation complete.
 pause
