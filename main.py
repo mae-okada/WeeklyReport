@@ -102,7 +102,7 @@ class WeeklyReportApp:
         """Execute the full weekly report generation workflow."""
         self.create_output_folder()
         df_old, df_new = self.load_latest_data()
-        # self.generate_change_report(df_old, df_new)
+        self.generate_change_report(df_old, df_new)
         self.generate_weekly_report(df_old, df_new)
 
 
